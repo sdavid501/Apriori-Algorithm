@@ -1,14 +1,20 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 import pandas as pd
 import numpy as np
 from itertools import combinations
 
-print("==================Welcome to Apriori Algorithm Module====================", "\n\n")
+
+# # Data Selection Instruction
+
+# In[ ]:
+
+
+print("=====================  Welcome to Apriori Algorithm Module  ======================", "\n")
 print("Select database: ")
 print("For Amazon, press 1")
 print("For Nike, press 2")
@@ -62,6 +68,12 @@ while True:
     else:
         print("Please select a valid number from the options above")
 
+
+# # Enter minimum support and confirmation
+
+# In[ ]:
+
+
 ms = "N"
 while not(ms == "Y" or ms == "y"):
     print("Set minimum support (%):")
@@ -74,8 +86,14 @@ while not(ms == "Y" or ms == "y"):
     if(minSupport > 100): 
         print("The minimum support can't be greater than 100%")
         continue
-    print("press Y to continue otherwise any other character to change the minimum support")
+    print("enter Y to continue or enter any other character to change the minimum support")
     ms = input()
+
+
+# # Enter Confidence and Confirmation
+
+# In[ ]:
+
 
 ms = "N"
 while not(ms == "Y" or ms == "y"):
@@ -89,9 +107,14 @@ while not(ms == "Y" or ms == "y"):
     if(confidence > 100): 
         print("The confidence can't be greater than 100%")
         continue
-    print("press Y to continue otherwise any other character to change the confidence")
+    print("enter Y to continue or enter any other character to change the confidence")
     ms = input()
-minSupportValue = int(np.ceil(minSupport/100 * len(transaction)))
+
+
+# # Preprocessing and Data cleaning
+
+# In[ ]:
+
 
 dataDict = {}
 transactions = []
@@ -105,14 +128,13 @@ for trans in transaction[transaction.columns[-1]]:
     trans = [i.upper().strip() for i in trans]
     transactions.append(trans)
 
-print(itemsets)
-transactions
+
+# # Calculating the count of each combination of items in the transactions
+
+# In[ ]:
 
 
-# In[2]:
-
-
-
+minSupportValue = int(np.ceil(minSupport/100 * len(transaction)))
 status = True
 combCount = 1
 dataDict = {}
@@ -136,16 +158,47 @@ while status and combCount <= len(transactions):
         else:
             dataDict[i] = temp[i]
     combCount += 1
-print("============================ FREQUENT ITEMSETS ============================")
+
+
+# # PRINTING ALL ITEMS AND THEIR CORRESPONDING SUPPORTS AND FILTERING ITEMS WHOSE SUPPORT IS >= MIN SUPPORT
+
+# In[ ]:
+
+
+# print("================================= SUPPORTS ON ITEMSETS =================================")
+# print('')
 assoItems = {}
 for i in dataDict:
     if dataDict[i] >= minSupportValue:
         assoItems[i] = dataDict[i]
-        print(i)
+#     print(i,':',dataDict[i])
+# print('\n')
 
-print("========= ALL ASSOCIATION RULES (Min Support: " 
-      +str(minSupport)+" Confidence:" +str(confidence)+")=========")
 
+# # PRINT FREQUENT ITEMSETS
+
+# In[ ]:
+
+
+print("================================= FREQUENT ITEMSETS =================================")
+print('')
+for i in assoItems:
+    print(i)
+if len(assoItems) == 0:
+    print('No frequent itemset can be determined with the minimum support of ' + str(minSupport)+'%')
+
+
+# # CALCULATING THE CONFIDENCE OF ITEMS WHOSE SUPPORT IS >= MIN SUPPORT, PRINTING ALL ITEMS THAT MET THE CONFIDENCE WITH THEIR CORRESPONDING SUPPORTS
+
+# In[ ]:
+
+
+print('\n')
+print("============== ALL ASSOCIATION RULES (Min Support: " 
+      +str(minSupport)+" Confidence:" +str(confidence)+")==============")
+
+print('')
+confidenceFlag = False
 for i in assoItems:
     if len(i.split(',')) < 2:
         continue
@@ -171,10 +224,12 @@ for i in assoItems:
             nItem1 = assoItems[item1]
             conf1 = (nItem/nItem1)* 100
             if conf1 >= confidence:
+                confidenceFlag = True
                 print(item1, '->', item2, " | Support = " + str(support)+'%', 
                  " | Confidence = " + str(conf1)+'%')
         
-        
+if not confidenceFlag:
+    print('No association rules can be determined with the minimum support of ' + str(minSupport) +'% and confidence of '+ str(confidence)+'%')
 
 
 # In[ ]:
